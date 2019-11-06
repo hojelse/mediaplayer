@@ -3,15 +3,15 @@
 
 const audioElement = document.querySelector("audio")
 
-const playBtn = document.querySelector(".play")
-playBtn.onclick = function(e) {
-  audioElement.play()
-}
+// const playBtn = document.querySelector(".play")
+// playBtn.onclick = function(e) {
+//   audioElement.play()
+// }
 
-const pauseBtn = document.querySelector(".pause")
-pauseBtn.onclick = function(e) {
-  audioElement.pause()
-}
+// const pauseBtn = document.querySelector(".pause")
+// pauseBtn.onclick = function(e) {
+//   audioElement.pause()
+// }
 
 if ("mediaSession" in navigator) {
   navigator.mediaSession.metadata = new MediaMetadata({
@@ -37,19 +37,19 @@ if ("mediaSession" in navigator) {
 
 const wrap = document.querySelector(".wrap")
 
-playBtn.addEventListener("click", e => play_1())
-pauseBtn.addEventListener("click", e => pause())
+// playBtn.addEventListener("click", e => play_1())
+// pauseBtn.addEventListener("click", e => pause())
 
-let playing = false
-audioElement.addEventListener("playing", e => {
-  playing = true
-})
-audioElement.addEventListener("pause", e => {
-  playing = false
-})
+// let playing = false
+// audioElement.addEventListener("playing", e => {
+//   playing = true
+// })
+// audioElement.addEventListener("pause", e => {
+//   playing = false
+// })
 
 function toggle() {
-  if (!playing) {
+  if (audioElement.paused) {
     const record = document.getElementById("record")
     const anchor = document.getElementById("anchor")
     const pointer = document.getElementById("pointer")
@@ -71,7 +71,7 @@ function toggle() {
 }
 
 function play_1() {
-  if (!playing) {
+  if (audioElement.paused) {
     const record = document.getElementById("record")
     const anchor = document.getElementById("anchor")
     const pointer = document.getElementById("pointer")
@@ -84,7 +84,7 @@ function play_1() {
 }
 
 function pause() {
-  if (playing) {
+  if (!audioElement.paused) {
     const record = document.getElementById("record")
     const anchor = document.getElementById("anchor")
     const pointer = document.getElementById("pointer")
@@ -100,14 +100,14 @@ audioElement.addEventListener("loadeddata", e => {
   document.querySelector(".length").innerHTML =
     Math.floor(audioElement.duration / 60) +
     ":" +
-    pad(Math.floor(audioElement.duration), 2)
+    leadZero(Math.floor(audioElement.duration), 2)
 })
 
 audioElement.addEventListener("timeupdate", e => {
   document.querySelector(".time").innerHTML =
     Math.floor(audioElement.currentTime / 60) +
     ":" +
-    pad(Math.floor(audioElement.currentTime), 2)
+    leadZero(Math.floor(audioElement.currentTime), 2)
 })
 
 let progress_2 = document.querySelector(".progress-2")
@@ -120,10 +120,16 @@ audioElement.addEventListener("timeupdate", e => {
   )
 })
 
-function pad(n, width, z) {
-  z = z || "0"
-  n = n + ""
-  return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n
+// function pad(n, width, z) {
+//   z = z || "0"
+//   n = n + ""
+//   return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n
+// }
+
+// const leadZero = n => n < 10 ? `0${n}` : n
+
+function leadZero(n) {
+  return n < 10 ? `0${n}` : n
 }
 
 let progress = document.querySelector(".progress")
@@ -137,3 +143,40 @@ progress.addEventListener("mousedown", e => {
 })
 progress.addEventListener("mousemove", e => {})
 document.addEventListener("mouseup", e => {})
+
+document.querySelector("#toggle").addEventListener("mousedown", e => {
+  if (audioElement.paused) {
+    audioElement.play()
+    play_1()
+    // Transform button to play state
+    e.currentTarget.children[0].setAttribute("d", "M5,2.5 l 10,0 0,35 -10,0z")
+    e.currentTarget.children[1].setAttribute("d", "M25,2.5 l 10,0 0,35 -10,0z")
+
+    //Transform Vinyl
+    const record = document.getElementById("record")
+    const anchor = document.getElementById("anchor")
+    const pointer = document.getElementById("pointer")
+    record.classList.add("record-on")
+    anchor.classList.add("anchor-on")
+    pointer.classList.add("pointer-on")
+    wrap.classList.add("wrap-on")
+  } else {
+    audioElement.pause()
+    pause()
+    // transform button to pause state
+    e.currentTarget.children[0].setAttribute(
+      "d",
+      "M2.5,0 l 17.5,10 0,20 -17.5,10 z"
+    )
+    e.currentTarget.children[1].setAttribute("d", "M20,10 l 20,10 -20,10 z")
+
+    //Transform Vinyl
+    const record = document.getElementById("record")
+    const anchor = document.getElementById("anchor")
+    const pointer = document.getElementById("pointer")
+    record.classList.remove("record-on")
+    anchor.classList.remove("anchor-on")
+    pointer.classList.remove("pointer-on")
+    wrap.classList.remove("wrap-on")
+  }
+})
